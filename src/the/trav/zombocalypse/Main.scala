@@ -25,12 +25,13 @@ object Main {
 
     val map = new Board(gridSize, gridSize)
     val player = new Player(map, playerStart)
-    val zombies = makeZombies(5, map)
-    map.tiles(playerStart).containsPlayer = true
+    map.tiles(playerStart).add(player)
 
-    frame.addKeyListener(new KeyAdapter{
+    val zombies = makeZombies(5, map)
+
+    frame.addKeyListener(new KeyAdapter {
       override def keyPressed(key:KeyEvent) {
-        if(key.getKeyCode() == KeyEvent.VK_ESCAPE)  {
+        if(key.getKeyCode() == KeyEvent.VK_ESCAPE) {
           System.exit(0)
         }
         player.handleKey(key)
@@ -48,18 +49,8 @@ object Main {
       val yOff = if(j % 2 == 0) 1 else 0
       val x = (2*i- yOff + 1) * w/2
       val y = (j + 2/3) * h
-      g.setColor(new Color(100,100,100))
-      g.fillOval(x.asInstanceOf[Int], y.asInstanceOf[Int], w.asInstanceOf[Int], h.asInstanceOf[Int])
+      t.draw(g, x.asInstanceOf[Int], y.asInstanceOf[Int], w.asInstanceOf[Int], h.asInstanceOf[Int])
 
-      if(t.containsPlayer) {
-        g.setColor(Color.BLACK)
-        g.fillOval(x.asInstanceOf[Int]+w.asInstanceOf[Int]/4, y.asInstanceOf[Int]+h.asInstanceOf[Int]/4, w.asInstanceOf[Int]/2, h.asInstanceOf[Int]/2)
-      }
-      
-      if(t.containsZombie) {
-        g.setColor(Color.RED)
-        g.fillOval(x.asInstanceOf[Int]+w.asInstanceOf[Int]/4, y.asInstanceOf[Int]+h.asInstanceOf[Int]/4, w.asInstanceOf[Int]/2, h.asInstanceOf[Int]/2)
-      }
     }
 
     frame.getContentPane().add(new JPanel(){
@@ -85,11 +76,12 @@ object Main {
   def makeZombie(board:Board) {
     val p = new Position(random.nextInt(gridSize), random.nextInt(gridSize))
     val tile = board.tiles(p)
-    if(tile.containsPlayer || tile.containsZombie) {
-      makeZombie(board)
+    if(tile.contents.isEmpty) {
+      val zombie = new Zombie(board, p)
+      board.tiles(p).add(zombie)
+      zombie
     } else {
-      board.tiles(p).containsZombie = true
-      new Zombie(board, p)
+      makeZombie(board)
     }
   }
 }
