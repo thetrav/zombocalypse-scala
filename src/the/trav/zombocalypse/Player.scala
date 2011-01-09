@@ -1,10 +1,10 @@
 package the.trav.zombocalypse
 
 import java.awt.event.KeyEvent
+import javax.swing.JOptionPane
 
-class Player(board:Board, startX:Int, startY:Int) {
-  var x = startX
-  var y = startY
+class Player(board:Board, startPos:Position) {
+  var pos = startPos
 
   def handleKey(key:KeyEvent) {
     key.getKeyCode match {
@@ -20,15 +20,24 @@ class Player(board:Board, startX:Int, startY:Int) {
   }
 
   def isEvenRow() = {
-    y % 2 == 0
+    pos.y % 2 == 0
   }
 
   def tryMove(xMove:Int, yMove:Int) {
-    if(board.tiles.contains(new Position(x + xMove, y + yMove))) {
-      board.tiles(new Position(x, y)).containsPlayer = false
-      x += xMove
-      y += yMove
-      board.tiles(new Position(x, y)).containsPlayer = true
+    val newPos = new Position(pos.x + xMove, pos.y + yMove)
+    if(board.tiles.contains(newPos)) {
+      val tile = board.tiles(newPos)
+      if(tile.containsZombie) {
+        JOptionPane.showMessageDialog(null, "You were eaten by a zombie!", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
+        System.exit(0)
+      }
+      move(newPos)
     }
+  }
+
+  def move(newPos:Position) {
+    board.tiles(pos).containsPlayer = false
+    board.tiles(newPos).containsPlayer = true
+    pos = newPos
   }
 }

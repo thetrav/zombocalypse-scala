@@ -9,8 +9,7 @@ import java.util.Random
 
 object Main {
   val gridSize = 20
-  val playerStartX = 0
-  val playerStartY = 0
+  val playerStart = new Position(0, 0)
 
   val emptyHex = ImageIO.read(new File("tinyhex.png"))
 
@@ -25,9 +24,9 @@ object Main {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
 
     val map = new Board(gridSize, gridSize)
-    val player = new Player(map, playerStartX, playerStartY)
+    val player = new Player(map, playerStart)
     val zombies = makeZombies(5, map)
-    map.tiles(new Position(playerStartX,playerStartY)).containsPlayer = true
+    map.tiles(playerStart).containsPlayer = true
 
     frame.addKeyListener(new KeyAdapter{
       override def keyPressed(key:KeyEvent) {
