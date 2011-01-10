@@ -1,9 +1,8 @@
 package the.trav.zombocalypse
 
 import java.awt.{Color, Graphics2D}
-import javax.swing.JOptionPane
 
-case class Zombie(player:Player, board:Board, startPos:Position) extends MobileEntity(board, startPos) {
+case class Zombie(player:Player, board:Board, startPos:Coord) extends MobileEntity(board, startPos) {
 
   override def zIndex = 10
 
@@ -23,13 +22,13 @@ case class Zombie(player:Player, board:Board, startPos:Position) extends MobileE
 
   def pathToPlayer() = {
     player.pos match {
-      case Position(x, y) if (y == pos.y) => if (x < pos.x) new Position(-1, 0) else new Position(1, 0)
-      case Position(x, y) =>
-        if (x <= pos.x && y <= pos.y) new Position(-1, -1) else
-        if (x > pos.x && y <= pos.y) new Position(1, -1) else
-        if (x <= pos.x && y > pos.y) new Position(-1, 1) else
-        if (x > pos.x && y > pos.y) new Position(1, 1) else
-        new Position(0, 0) //should never occur under base rules
+      case Coord(x, y) if (y == pos.y) => if (x < pos.x) new Coord(-1, 0) else new Coord(1, 0)
+      case Coord(x, y) =>
+        if (x <= pos.x && y <= pos.y) new Coord(-1, -1) else
+        if (x > pos.x && y <= pos.y) new Coord(1, -1) else
+        if (x <= pos.x && y > pos.y) new Coord(-1, 1) else
+        if (x > pos.x && y > pos.y) new Coord(1, 1) else
+        new Coord(0, 0) //should never occur under base rules
     }
   }
 }

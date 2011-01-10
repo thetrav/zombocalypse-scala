@@ -10,14 +10,14 @@ import java.util.Random
 object Main {
   val random = new Random(System.currentTimeMillis)
   val gridSize = 20
-  val playerStart = new Position(0, 0)
+  val playerStart = new Coord(0, 0)
 
   val emptyHex = ImageIO.read(new File("tinyhex.png"))
 
   val twoTimesSinSixtyDeg = 2 * Math.sin(Math.toRadians(60))
 
-  val canvasSize = new Position(800,600)
-  val frameSize = new Position(canvasSize.x, canvasSize.y)
+  val canvasSize = new Coord(800,600)
+  val frameSize = new Coord(canvasSize.x, canvasSize.y)
 
   val map = new Board(gridSize, gridSize)
   val player = new Player(map, playerStart)
@@ -41,7 +41,7 @@ object Main {
       }
     })
 
-    def drawTile(g:Graphics2D, p:Position, t:Tile) {
+    def drawTile(g:Graphics2D, p:Coord, t:Tile) {
       val i = p.x
       val j = p.y
       val size = canvasSize.y / gridSize
@@ -60,7 +60,7 @@ object Main {
         val g = g1.asInstanceOf[Graphics2D]
         g.setColor(Color.white)
         g.fillRect(0,0, canvasSize.x, canvasSize.y)
-        map.tiles.foreach((entry:(Position, Tile)) => {
+        map.tiles.foreach((entry:(Coord, Tile)) => {
           drawTile(g, entry._1, entry._2)
         })
       }
@@ -76,7 +76,7 @@ object Main {
 
 
   def makeZombie(board:Board):Zombie = {
-    val p = new Position(random.nextInt(gridSize), random.nextInt(gridSize))
+    val p = new Coord(random.nextInt(gridSize), random.nextInt(gridSize))
     val tile = board.tiles(p)
     if(tile.contents.isEmpty) {
       val zombie = new Zombie(player, board, p)
