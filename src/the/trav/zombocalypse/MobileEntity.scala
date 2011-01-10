@@ -2,19 +2,29 @@ package the.trav.zombocalypse
 
 import javax.swing.JOptionPane
 
+trait MoveResult
+
+case object Blocked extends MoveResult
+case class MoveSuccess(pos:Position) extends MoveResult
+case class Bump(mob:MobileEntity) extends MoveResult
+
 abstract class MobileEntity(board:Board, initialPos:Position) extends Drawable {
   var pos = initialPos
 
-  def tryMove(xMove:Int, yMove:Int) {
-    val newPos = new Position(pos.x + xMove, pos.y + yMove)
+  def tryMove(posChange:Position):MoveResult = {
+    val newPos = new Position(pos.x + posChange.x, pos.y + posChange.y)
     if(board.tiles.contains(newPos)) {
       val tile = board.tiles(newPos)
-      if(tile.contents.isEmpty) {
-        move(newPos)
+      if(tile.isEmpty) {
+        println("success")
+        MoveSuccess(newPos)
       } else {
-        JOptionPane.showMessageDialog(null, "You were eaten by a zombie!", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
-        System.exit(0)
+        println("bump")
+        Bump(tile.max.asInstanceOf[MobileEntity])
       }
+    } else {
+      println("tile does not exist")
+      Blocked
     }
   }
 

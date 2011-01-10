@@ -8,6 +8,7 @@ import java.awt.{Color, Graphics2D, Graphics}
 import java.util.Random
 
 object Main {
+  val random = new Random(System.currentTimeMillis)
   val gridSize = 20
   val playerStart = new Position(0, 0)
 
@@ -18,16 +19,16 @@ object Main {
   val canvasSize = new Position(800,600)
   val frameSize = new Position(canvasSize.x, canvasSize.y)
 
+  val map = new Board(gridSize, gridSize)
+  val player = new Player(map, playerStart)
+  map.tiles(playerStart).add(player)
+
+  val zombies = makeZombies(5, map)
+
   def main(args:Array[String]) {
     val frame = new JFrame("zombocalypse")
     frame.setSize(frameSize.x, frameSize.y)
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-
-    val map = new Board(gridSize, gridSize)
-    val player = new Player(map, playerStart)
-    map.tiles(playerStart).add(player)
-
-    val zombies = makeZombies(5, map)
 
     frame.addKeyListener(new KeyAdapter {
       override def keyPressed(key:KeyEvent) {
@@ -35,6 +36,7 @@ object Main {
           System.exit(0)
         }
         player.handleKey(key)
+        zombies.foreach((z:Zombie) => z.simulate())
         frame.repaint()
       }
     })
@@ -68,16 +70,16 @@ object Main {
   }
 
   def makeZombies(num:Int, board:Board) = {
-    List(for(i <- 0 to num) yield makeZombie(board))
+    for(i <- 0 to num) yield makeZombie(board)
   }
 
 
-  val random = new Random(System.currentTimeMillis)
-  def makeZombie(board:Board) {
+
+  def makeZombie(board:Board):Zombie = {
     val p = new Position(random.nextInt(gridSize), random.nextInt(gridSize))
     val tile = board.tiles(p)
     if(tile.contents.isEmpty) {
-      val zombie = new Zombie(board, p)
+      val zombie = new Zombie(player, board, p)
       board.tiles(p).add(zombie)
       zombie
     } else {

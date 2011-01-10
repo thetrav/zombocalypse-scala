@@ -10,8 +10,8 @@ class Tile {
     g.fillOval(x, y, width, height)
 
     if(!contents.isEmpty) {
-      val max = contents.max
-      max.draw(g, x, y, width, height)
+      val topElement = contents.max
+      topElement.draw(g, x, y, width, height)
     }
   }
 
@@ -22,4 +22,8 @@ class Tile {
   def remove(d:Drawable) {
     contents = contents.filter((p) => p != d)
   }
+
+  def isEmpty = contents.isEmpty
+
+  def max = contents.max
 }
