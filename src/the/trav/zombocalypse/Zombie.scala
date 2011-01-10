@@ -13,7 +13,6 @@ case class Zombie(player:Player, board:Board, startPos:Coord) extends MobileEnti
 
   def simulate() {
     val step = pathToPlayer()
-    println("got move:"+step.x+","+step.y)
     tryMove(step) match {
       case MoveSuccess(p) => move(p)
       case _ => "nothing"

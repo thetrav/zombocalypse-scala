@@ -23,7 +23,7 @@ object Main {
   val player = new Player(map, playerStart)
   map.tiles(playerStart).add(player)
 
-  val zombies = makeZombies(5, map)
+  val zombies = makeZombies(20, map)
 
   def main(args:Array[String]) {
     val frame = new JFrame("zombocalypse")

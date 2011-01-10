@@ -9,25 +9,25 @@ case class Player(board:Board, startPos:Coord) extends MobileEntity(board, start
     val newPos = key.getKeyCode match {
       case KeyEvent.VK_T => new Coord(if(isEvenRow) 0 else 1, -1) //NORTH_EAST
       case KeyEvent.VK_G => new Coord(1, 0) //EAST
-      case KeyEvent.VK_B => {println("B! even"+isEvenRow); new Coord(if(isEvenRow) 0 else 1, 1)}  //SOUTH_EAST
+      case KeyEvent.VK_B => new Coord(if(isEvenRow) 0 else 1, 1)  //SOUTH_EAST
 
       case KeyEvent.VK_C => new Coord(if(isEvenRow) -1 else 0, 1) // SOUTH_WEST
       case KeyEvent.VK_D => new Coord(-1, 0) // WEST
       case KeyEvent.VK_E => new Coord(if(isEvenRow) -1 else 0, -1) // NORTH_WEST
       case _ => new Coord(0,0)
     }
-    println("got move:"+newPos.x+","+newPos.y)
     tryMove(newPos) match {
       case MoveSuccess(p) => {
-        println("move success")
         move(p)
       }
       case Bump(z) => {
-        println("bump!")
         if(z != this) {
           JOptionPane.showMessageDialog(null, "You were eaten by a zombie!", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
           System.exit(0)
         }
+      }
+      case _ => {
+        "nothing"
       }
     }
   }
