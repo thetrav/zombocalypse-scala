@@ -29,10 +29,17 @@ case class Player(board:Board, startPos:Coord) extends MobileEntity(board, start
       case MoveSuccess(p) => {
         move(p)
       }
-      case Bump(z) => {
-        if(z != this) {
-          JOptionPane.showMessageDialog(null, "You were eaten by a zombie!", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
-          System.exit(0)
+      case Bump(b) => {
+        b match {
+          case Zombie(_, _, _) => {
+            JOptionPane.showMessageDialog(null, "You were eaten by a zombie!", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
+            System.exit(0)
+          }
+          case Exit() => {
+            JOptionPane.showMessageDialog(null, "You Survived!", "Hurray!", JOptionPane.INFORMATION_MESSAGE)
+            System.exit(0)
+          }
+          case x => println("what the heck is this? " + x)
         }
       }
       case _ => {
@@ -41,10 +48,9 @@ case class Player(board:Board, startPos:Coord) extends MobileEntity(board, start
     }
   }
 
-  def draw(g:Graphics2D, x:Int, y:Int, width:Int, height:Int) {
-    g.setColor(Color.BLACK)
-    g.fillOval(x+width/4, y+height/4, width/2, height/2)
+  def draw(g:Graphics2D, hex:Hex) {
+    hex.fillHalfCirle(g, Color.BLACK)
   }
-
+  
   def zIndex = 10
 }

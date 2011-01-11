@@ -4,7 +4,7 @@ trait MoveResult
 
 case object Blocked extends MoveResult
 case class MoveSuccess(pos:Coord) extends MoveResult
-case class Bump(mob:MobileEntity) extends MoveResult
+case class Bump(mob:AnyRef) extends MoveResult
 
 abstract class MobileEntity(board:Board, initialPos:Coord) extends Drawable {
   var pos = initialPos
@@ -16,7 +16,7 @@ abstract class MobileEntity(board:Board, initialPos:Coord) extends Drawable {
       if(tile.isEmpty) {
         MoveSuccess(newPos)
       } else {
-        Bump(tile.max.asInstanceOf[MobileEntity])
+        Bump(tile.max)
       }
     } else {
       Blocked

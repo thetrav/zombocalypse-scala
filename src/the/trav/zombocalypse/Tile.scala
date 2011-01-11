@@ -1,14 +1,15 @@
 package the.trav.zombocalypse
 
-import java.awt.{Color, Graphics2D}
+import java.awt.Graphics2D
+
+
 
 class Tile {
   var contents = List[Drawable]()
 
-  def draw(g:Graphics2D, x:Int, y:Int, width:Int, height:Int) {
+  def draw(g:Graphics2D, hex:Hex) {
     if(!contents.isEmpty) {
-      val topElement = contents.max
-      topElement.draw(g, x, y, width, height)
+      contents.max.draw(g, hex)
     }
   }
 
@@ -16,7 +17,7 @@ class Tile {
      contents = d :: contents
   }
 
-  def remove(d:Drawable) {
+  def remove(d:AnyRef) {
     contents = contents.filter((p) => p != d)
   }
 

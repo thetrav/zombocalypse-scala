@@ -8,9 +8,8 @@ case class Zombie(player:Player, board:Board, startPos:Coord) extends MobileEnti
 
   override def zIndex = 10
 
-  override def draw(g:Graphics2D, x:Int, y:Int, width:Int, height:Int) {
-    g.setColor(Color.RED)
-    g.fillOval(x+width/4, y+height/4, width/2, height/2)
+  override def draw(g:Graphics2D, hex:Hex) {
+    hex.fillHalfCirle(g, Color.RED)
   }
 
   def simulate() {

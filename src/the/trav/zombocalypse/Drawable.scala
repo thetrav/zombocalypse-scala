@@ -6,7 +6,7 @@ trait Drawable extends Ordered[Drawable] {
   /**
    * draw self to the rectangle provided using the graphics context passed in
    */
-  def draw(g:Graphics2D, x:Int, y:Int, width:Int, height:Int)
+  def draw(g:Graphics2D, hex:Hex)
   def zIndex:Int
 
   override def compare(o:Drawable) = {
