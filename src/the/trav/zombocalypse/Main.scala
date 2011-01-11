@@ -11,7 +11,7 @@ object Main {
   val map = new Board(gridSize, gridSize)
   val player = new Player(map, playerStart)
   map.tiles(playerStart).add(player)
-  map.tiles(exit).add(Exit())
+  map.tiles(exit).add(Exit)
 
   val zombies = makeZombies(numZombies, map)
 

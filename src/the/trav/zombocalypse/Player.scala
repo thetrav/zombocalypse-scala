@@ -35,7 +35,7 @@ case class Player(board:Board, startPos:Coord) extends MobileEntity(board, start
             JOptionPane.showMessageDialog(null, "You were eaten by a zombie!", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
             System.exit(0)
           }
-          case Exit() => {
+          case Exit => {
             JOptionPane.showMessageDialog(null, "You Survived!", "Hurray!", JOptionPane.INFORMATION_MESSAGE)
             System.exit(0)
           }
