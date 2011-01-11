@@ -1,7 +1,5 @@
 package the.trav.zombocalypse
 
-import javax.swing.JOptionPane
-
 trait MoveResult
 
 case object Blocked extends MoveResult
@@ -31,5 +29,5 @@ abstract class MobileEntity(board:Board, initialPos:Coord) extends Drawable {
     pos = newPos
   }
 
-  def isEvenRow = pos.y % 2 == 0
+  
 }

@@ -10,7 +10,12 @@ import java.util.Random
 object Main {
   val random = new Random(System.currentTimeMillis)
   val gridSize = 20
-  val playerStart = new Coord(0, 0)
+  val playerStart = new Coord(gridSize/2, gridSize/2)
+
+  val noFog = false
+  val showZombieView = false
+  val player_view_distance = 4
+  val show_coords = false
 
   val emptyHex = ImageIO.read(new File("tinyhex.png"))
 
@@ -41,18 +46,79 @@ object Main {
       }
     })
 
-    def drawTile(g:Graphics2D, p:Coord, t:Tile) {
-      val i = p.x
-      val j = p.y
-      val size = canvasSize.y / gridSize
-      val r = size / 2
-      val w = size
-      val h = 3 * r / twoTimesSinSixtyDeg
-      val yOff = if(j % 2 == 0) 1 else 0
-      val x = (2*i- yOff + 1) * w/2
-      val y = (j + 2/3) * h
-      t.draw(g, x.asInstanceOf[Int], y.asInstanceOf[Int], w.asInstanceOf[Int], h.asInstanceOf[Int])
 
+
+    case class Hex(c:Coord) {
+      def i = c.x
+      def j = c.y
+      def size = canvasSize.y / gridSize
+      def r = size / 2
+      def w = size
+      def height = 3 * r / twoTimesSinSixtyDeg
+      def h = height.asInstanceOf[Int]
+      def yOff = if(j % 2 == 0) 1 else 0
+      def xCoord = (2*i- yOff + 1) * w/2
+      def yCoord = (j + 2/3) * height
+      def x = xCoord.asInstanceOf[Int]
+      def y = yCoord.asInstanceOf[Int]
+
+      def drawCoords(g:Graphics2D) {
+        if(show_coords) {
+          g.setColor(Color.ORANGE)
+          g.drawString((i+","+j).asInstanceOf[String], x+w/4-12, y+h/4-12)
+        }
+      }
+
+      def drawCircle(g:Graphics2D) {
+        g.setColor(Color.black)
+        g.drawOval(x, y, w, h)
+      }
+
+      def fillCircle(g:Graphics2D, c:Color) {
+        g.setColor(c)
+        g.fillOval(x, y, w, h)
+      }
+    }
+
+    def drawTile(g:Graphics2D, hex:Hex, t:Tile) {
+      t.draw(g, hex.x, hex.y, hex.w, hex.h)
+    }
+
+    def drawZombieView(g:Graphics2D) {
+      zombies.foreach((z:Zombie) => {
+        z.visiblePositions().foreach((pos:Coord) => {
+          if(map.contains(pos)) {
+            val hex = Hex(pos)
+            hex.fillCircle(g, new Color(200,100,100))
+          }
+        })
+      })
+    }
+
+    def drawPlaceMarkers(g:Graphics2D) {
+      map.tiles.foreach((entry:(Coord, Tile)) => {
+        val hex = Hex(entry._1)
+        hex.drawCircle(g)
+        if(noFog) drawTile(g, hex, map(entry._1))
+        hex.drawCoords(g)
+      })
+    }
+
+    def drawPlayerView(g:Graphics2D) {
+      Coord.getCircle(player.pos, player_view_distance).foreach((pos:Coord) => {
+        if(map.contains(pos)) {
+          val hex = Hex(pos)
+          hex.fillCircle(g, new Color(100,100,100))
+          drawTile(g, hex, map(pos))
+          hex.drawCoords(g)
+        }
+      })
+    }
+
+    def drawScene(g:Graphics2D) {
+      if(showZombieView) drawZombieView(g)
+      drawPlaceMarkers(g)
+      drawPlayerView(g)
     }
 
     frame.getContentPane().add(new JPanel(){
@@ -60,20 +126,15 @@ object Main {
         val g = g1.asInstanceOf[Graphics2D]
         g.setColor(Color.white)
         g.fillRect(0,0, canvasSize.x, canvasSize.y)
-        map.tiles.foreach((entry:(Coord, Tile)) => {
-          drawTile(g, entry._1, entry._2)
-        })
+        drawScene(g)
       }
+      frame.setVisible(true)
     })
-
-    frame.setVisible(true)
   }
 
   def makeZombies(num:Int, board:Board) = {
     for(i <- 0 to num) yield makeZombie(board)
   }
-
-
 
   def makeZombie(board:Board):Zombie = {
     val p = new Coord(random.nextInt(gridSize), random.nextInt(gridSize))

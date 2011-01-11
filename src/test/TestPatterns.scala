@@ -2,18 +2,17 @@ package test
 
 object Main {
   def main(args:Array[String]) {
-    val result:Result = Nth(5)
-    println(result match {
-      case First => "first"
-      case Second => "second"
-      case Nth(n) => n+"th"
-    })
+    val aFoo = Foo(1)
+    val anotherFoo = aFoo(1)
+    val emptyList = List[Foo]()
+    val listWithFoo = aFoo :: emptyList
+    val bigerList = anotherFoo :: listWithFoo
+    println(anotherFoo)
   }
 }
 
-trait Result
+case class Foo(f:Int) {
+  def apply(i:Int) = Foo(f+i)
+}
 
-case object First extends Result
-case object Second extends Result
-case class Nth(n:Int) extends Result
 
