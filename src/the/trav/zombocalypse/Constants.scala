@@ -15,8 +15,11 @@ object Constants {
 
   val noFog = false
   val showZombieView = false
-  val player_view_distance = 4
+  val playerViewDistance = 4
+  val zombieViewDistance = 3
+  val player_view_distance = playerViewDistance
   val show_coords = false
+  val showAllZombies = false
 
 
 

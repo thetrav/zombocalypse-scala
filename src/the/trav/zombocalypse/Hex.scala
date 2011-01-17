@@ -34,7 +34,7 @@ case class Hex(c:Coord) {
     g.fillOval(x, y, w, h)
   }
 
-  def fillHalfCirle(g:Graphics2D, c:Color) {
+  def fillHalfCircle(g:Graphics2D, c:Color) {
     g.setColor(c)
     g.fillOval(x+w/4, y+h/4, w/2, h/2)
   }
