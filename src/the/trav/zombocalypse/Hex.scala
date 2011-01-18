@@ -18,7 +18,7 @@ case class Hex(c:Coord) {
   def y = yCoord.asInstanceOf[Int]
 
   def drawCoords(g:Graphics2D) {
-    if(show_coords) {
+    if(showCoords) {
       g.setColor(Color.ORANGE)
       g.drawString((i+","+j).asInstanceOf[String], x+w/4-12, y+h/4-12)
     }

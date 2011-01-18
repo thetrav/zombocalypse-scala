@@ -5,12 +5,36 @@ import java.awt.{Color, Graphics2D, Graphics}
 import the.trav.zombocalypse.Constants._
 import the.trav.zombocalypse._
 import javax.swing.{JOptionPane, JPanel, JFrame}
+import java.util.Random
 
 object Main {
+  val random = new Random(System.currentTimeMillis)
 
+  def addZombie(b:Board, ignore:Int) = {
+    findFreeCoord(b, gridSize, gridSize, 10) match {
+      case Some(c) => {
+        b.addZombie(c)
+      }
+      case None => {
+        b
+      }
+    }
+  }
 
-  def newBoard = {
-    Board.newBoard(gridSize, gridSize).addZombie(Coord(5,5))
+  def newBoard(numZombies:Int) = {
+    val range = 0 until numZombies
+    val initialBoard = Board.newBoard(gridSize, gridSize)
+    range.foldLeft[Board](initialBoard)(addZombie)
+  }
+
+  def findFreeCoord(b:Board, xMax:Int, yMax:Int, retry:Int):Option[Coord] = {
+    val coord = Coord(random.nextInt(xMax), random.nextInt(yMax))
+
+    if (b.player == coord || b.exit == coord || b.hasZombie(coord)) {
+      if(retry > 0) findFreeCoord(b, xMax, yMax, retry-1) else None
+    } else {
+      Some(coord)
+    }
   }
 
   def main(args:Array[String]) {
@@ -18,7 +42,8 @@ object Main {
     frame.setSize(frameSize.x, frameSize.y)
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
 
-    var board = newBoard
+    var numZombies = initialZombies
+    var board = newBoard(numZombies)
 
     frame.addKeyListener(new KeyAdapter {
       override def keyPressed(key:KeyEvent) {
@@ -34,11 +59,13 @@ object Main {
               }
               case Eaten => {
                 JOptionPane.showMessageDialog(frame, "You were eaten by a zombie", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
-                board = newBoard
+                numZombies += difficultyDecrease
+                board = newBoard(numZombies)
               }
               case Escaped => {
                 JOptionPane.showMessageDialog(frame, "You Escaped", "Hurray!", JOptionPane.INFORMATION_MESSAGE)
-                board = newBoard
+                numZombies += difficultyIncrease
+                board = newBoard(numZombies)
               }
             }
 

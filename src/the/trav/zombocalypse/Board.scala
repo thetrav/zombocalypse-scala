@@ -2,10 +2,11 @@ package the.trav.zombocalypse
 
 import java.awt.{Color, Graphics2D}
 import the.trav.zomboclypse._
+import Constants._
 
 object Board {
   def newBoard(width:Int, height:Int) = {
-    Board(Coord(0,0), Map[Coord, Zombie](), Coord(width-1, height-1))
+    Board(playerStart, Map[Coord, Zombie](), Coord(width-1, random.nextInt(height-1)))
   }
 }
 
@@ -32,7 +33,9 @@ case class Board(player:Coord, zombies:Map[Coord, Zombie], exit:Coord) {
 
   def drawZombies(g:Graphics2D) {
     zombies.foreach((t:(Coord, Zombie)) => {
-      Hex(t._1).fillHalfCircle(g, Color.red)
+      val hex = Hex(t._1)
+      hex.fillHalfCircle(g, Color.red)
+      if(showCoords) hex.drawCoords(g)
     })
   }
 
@@ -42,12 +45,15 @@ case class Board(player:Coord, zombies:Map[Coord, Zombie], exit:Coord) {
       hex.fillCircle(g, new Color(150,150,150))
       if(hasZombie(c)) hex.fillHalfCircle(g, Color.red)
       if(c == exit) hex.fillHalfCircle(g, Color.green)
+      if(showCoords) hex.drawCoords(g)
     }
     player.getCircle(playerViewDistance).foreach(drawViewedTile)
   }
 
   def drawPlayer(g:Graphics2D) {
-    Hex(player).fillHalfCircle(g, Color.black)
+    val hex = Hex(player)
+    hex.fillHalfCircle(g, Color.black)
+    if(showCoords) hex.drawCoords(g)
   }
 
   def movePlayer(d:Direction):MoveResult = {

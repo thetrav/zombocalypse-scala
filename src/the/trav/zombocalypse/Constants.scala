@@ -8,20 +8,17 @@ object Constants {
   val random = new Random(System.currentTimeMillis)
 
   val gridSize = 20
-  val numZombies = 20
+  val initialZombies = 20
 
-  val playerStart = new Coord(0, gridSize/2)
-  val exit = new Coord(gridSize-1, random.nextInt(gridSize))
+  val difficultyIncrease = 2
+  val difficultyDecrease = -5
 
-  val noFog = false
-  val showZombieView = false
+  val playerStart = Coord(0, gridSize/2)
+
   val playerViewDistance = 4
   val zombieViewDistance = 3
-  val player_view_distance = playerViewDistance
-  val show_coords = false
   val showAllZombies = false
-
-
+  val showCoords = false
 
   val twoTimesSinSixtyDeg = 2 * Math.sin(Math.toRadians(60))
   val canvasSize = new Coord(800,600)
