@@ -4,13 +4,27 @@ import java.awt.{Color, Graphics2D}
 import the.trav.zomboclypse._
 import Constants._
 
+case object Player
+case class Zombie
+case class Wall
+
 object Board {
+  def addColumnWalls(b:Board, row:Int) = {
+    b.addWall(Coord(-1, row)).addWall(Coord(gridSize, row))
+  }
+
+  def addRowWalls(b:Board, column:Int) = {
+    b.addWall(Coord(column, -1)).addWall(Coord(column, gridSize))
+  }
+
   def newBoard(width:Int, height:Int) = {
-    Board(playerStart, Map[Coord, Zombie](), Coord(width-1, random.nextInt(height-1)))
+    val withoutWalls = Board(playerStart, Map[Coord, Zombie](), Coord(width-1, random.nextInt(height-1)), Map[Coord, Wall]())
+    val withColumnWalls = (0 until width).foldLeft[Board](withoutWalls)(addColumnWalls)
+    (0 until height).foldLeft[Board](withColumnWalls)(addRowWalls).addWall(Coord(-1,-1)).addWall(Coord(gridSize, gridSize))
   }
 }
 
-case class Board(player:Coord, zombies:Map[Coord, Zombie], exit:Coord) {
+case class Board(player:Coord, zombies:Map[Coord, Zombie], exit:Coord, walls:Map[Coord, Wall]) {
   def direction(from:Coord, to:Coord) = {
     if(from.y == to.y && from.x < to.x) E else
     if(from.y == to.y && from.x > to.x) W else
@@ -28,8 +42,10 @@ case class Board(player:Coord, zombies:Map[Coord, Zombie], exit:Coord) {
   }
 
   def hasZombie(c:Coord) = zombies.contains(c)
+  def hasWall(c:Coord) = walls.contains(c)
 
-  def addZombie(c:Coord) = Board(player, zombies + (c -> Zombie()), exit)
+  def addZombie(c:Coord) = Board(player, zombies + (c -> Zombie()), exit, walls)
+  def addWall(c:Coord) = Board(player, zombies, exit, walls + (c->Wall()))
 
   def drawZombies(g:Graphics2D) {
     zombies.foreach((t:(Coord, Zombie)) => {
@@ -42,7 +58,8 @@ case class Board(player:Coord, zombies:Map[Coord, Zombie], exit:Coord) {
   def drawPlayerView(g:Graphics2D) {
     def drawViewedTile(c:Coord) {
       val hex = Hex(c)
-      hex.fillCircle(g, new Color(150,150,150))
+      hex.fillCircle(g, new Color(200,200,200))
+      if(hasWall(c)) hex.fillCircle(g, Color.darkGray)
       if(hasZombie(c)) hex.fillHalfCircle(g, Color.red)
       if(c == exit) hex.fillHalfCircle(g, Color.green)
       if(showCoords) hex.drawCoords(g)
@@ -62,14 +79,19 @@ case class Board(player:Coord, zombies:Map[Coord, Zombie], exit:Coord) {
       Eaten
     } else if (newPos == exit) {
       Escaped
+    } else if (hasWall(newPos)) {
+      Blocked
     } else {
-      Board(newPos, zombies, exit).simulateZombies()
+      Board(newPos, zombies, exit, walls).simulateZombies()
     }
   }
 
   def moveZombie(c:Coord, d:Direction) = {
     c.getCircle(zombieViewDistance).find((p:Coord)=> p == player) match {
-      case Some(_) => Board(player, zombies - c + (c.go(d, 1)-> Zombie()), exit)
+      case Some(_) => {
+        val newPos = c.go(d, 1)
+        if(hasWall(newPos)) this else Board(player, zombies - c + (newPos-> Zombie()), exit, walls)
+      }
       case None => this
     }
   }

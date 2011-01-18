@@ -66,6 +66,9 @@ object Main {
               numZombies += difficultyIncrease
               board = newBoard(numZombies)
             }
+            case Blocked => {
+              JOptionPane.showMessageDialog(frame, "Cannot Move There", "???", JOptionPane.WARNING_MESSAGE)
+            }
           }
 
         }
@@ -131,6 +134,4 @@ trait MoveResult
 case class Moved(b:Board) extends MoveResult
 case object Eaten extends MoveResult
 case object Escaped extends MoveResult
-
-case object Player
-case class Zombie
+case object Blocked extends MoveResult
