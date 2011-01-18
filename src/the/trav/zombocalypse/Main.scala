@@ -38,12 +38,42 @@ object Main {
   }
 
   def main(args:Array[String]) {
-    val frame = new JFrame("zombocalypse")
+
+    var numZombies = initialZombies
+    def getTitle = title + " " + numZombies + " zombies"
+    
+    val frame = new JFrame(getTitle)
     frame.setSize(frameSize.x, frameSize.y)
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
 
-    var numZombies = initialZombies
+
     var board = newBoard(numZombies)
+
+    def handleCommand(direction:Option[Direction]) {
+      direction match {
+        case Some(d) => {
+          board.movePlayer(d) match {
+            case Moved(b:Board) => {
+              board = b
+            }
+            case Eaten => {
+              JOptionPane.showMessageDialog(frame, "You were eaten by a zombie", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
+              numZombies += difficultyDecrease
+              board = newBoard(numZombies)
+            }
+            case Escaped => {
+              JOptionPane.showMessageDialog(frame, "You Escaped", "Hurray!", JOptionPane.INFORMATION_MESSAGE)
+              numZombies += difficultyIncrease
+              board = newBoard(numZombies)
+            }
+          }
+
+        }
+        case None => {
+
+        }
+      }
+    }
 
     frame.addKeyListener(new KeyAdapter {
       override def keyPressed(key:KeyEvent) {
@@ -51,29 +81,9 @@ object Main {
           System.exit(0)
         }
 
-        getKeyCommand(key.getKeyCode()) match {
-          case Some(d) => {
-            board.movePlayer(d) match {
-              case Moved(b:Board) => {
-                board = b
-              }
-              case Eaten => {
-                JOptionPane.showMessageDialog(frame, "You were eaten by a zombie", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
-                numZombies += difficultyDecrease
-                board = newBoard(numZombies)
-              }
-              case Escaped => {
-                JOptionPane.showMessageDialog(frame, "You Escaped", "Hurray!", JOptionPane.INFORMATION_MESSAGE)
-                numZombies += difficultyIncrease
-                board = newBoard(numZombies)
-              }
-            }
-
-          }
-          case None => {
-            
-          }
-        }
+        val direction = getKeyCommand(key.getKeyCode())
+        handleCommand(direction)
+        frame.setTitle(getTitle)
         frame.repaint()
       }
     })

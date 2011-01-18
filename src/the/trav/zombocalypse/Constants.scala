@@ -25,5 +25,6 @@ object Constants {
   val frameSize = new Coord(canvasSize.x, canvasSize.y)
 
   val emptyHex = ImageIO.read(new File("tinyhex.png"))
+  val title = "zombocalypse"
 
 }
