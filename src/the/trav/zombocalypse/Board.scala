@@ -4,8 +4,9 @@ import java.awt.{Color, Graphics2D}
 import the.trav.zomboclypse._
 import Constants._
 
-case class Player(c:Coord, food:Int) {
-  def apply(newPos:Coord, foodChange:Int) = Player(newPos, food+foodChange)
+case class Player(c:Coord, food:Int, health:Int) {
+  def apply(newPos:Coord) = Player(newPos, food, health)
+  def apply(newPos:Coord, foodChange:Int, healthChange:Int) = Player(newPos, food+foodChange, health+healthChange)
 
   def getCircle(r:Int) = c.getCircle(r)
   def draw(g:Graphics2D) {
@@ -28,8 +29,13 @@ object Board {
     b.addWall(Coord(column, -1)).addWall(Coord(column, gridSize))
   }
 
-  def newBoard(width:Int, height:Int) = {
-    val withoutWalls = Board(0, Player(playerStartPos, playerStartFood), Map[Coord, Zombie](), Coord(width-1, random.nextInt(height-1)), Map[Coord, Wall]())
+  def newBoard(width:Int, height:Int):Board = {
+    val player = Player(playerStartPos, playerStartFood, playerStartHealth)
+    newBoard(width, height, player)
+  }
+
+  def newBoard(width:Int, height:Int, player:Player):Board = {
+    val withoutWalls = Board(0, player(playerStartPos), Map[Coord, Zombie](), Coord(width-1, random.nextInt(height-1)), Map[Coord, Wall]())
     val withColumnWalls = (0 until width).foldLeft[Board](withoutWalls)(addColumnWalls)
     (0 until height).foldLeft[Board](withColumnWalls)(addRowWalls).addWall(Coord(-1,-1)).addWall(Coord(gridSize, gridSize))
   }
@@ -98,7 +104,7 @@ case class Board(moves:Int, player:Player, zombies:Map[Coord, Zombie], exit:Coor
     } else if (player.food == 1){
       Starved
     } else {
-      this(player(newPos, -foodUsedPerMove)).simulateZombies()
+      this(player(newPos, -foodUsedPerMove, 0)).simulateZombies()
     }
   }
 

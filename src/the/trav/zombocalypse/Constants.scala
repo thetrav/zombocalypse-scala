@@ -17,6 +17,7 @@ object Constants {
 
   val playerStartPos = Coord(0, gridSize/2)
   val playerStartFood = 50
+  val playerStartHealth = 100
 
   val playerViewDistance = 4
   val zombieViewDistance = 3

@@ -22,9 +22,15 @@ object Main {
   }
 
   def newBoard(numZombies:Int) = {
-    val range = 0 until numZombies
-    val initialBoard = Board.newBoard(gridSize, gridSize)
-    range.foldLeft[Board](initialBoard)(addZombie)
+    addZombies(numZombies, Board.newBoard(gridSize, gridSize))
+  }
+
+  def addZombies(n:Int, b:Board) = {
+    (0 until n).foldLeft[Board](b)(addZombie)
+  }
+
+  def newBoard(numZombies:Int, p:Player) = {
+    addZombies(numZombies, Board.newBoard(gridSize, gridSize, p))
   }
 
   def findFreeCoord(b:Board, xMax:Int, yMax:Int, retry:Int):Option[Coord] = {
@@ -68,7 +74,7 @@ object Main {
             case Escaped => {
               JOptionPane.showMessageDialog(frame, "You Escaped", "Hurray!", JOptionPane.INFORMATION_MESSAGE)
               numZombies += difficultyIncrease
-              board = newBoard(numZombies)
+              board = newBoard(numZombies, board.player)
             }
             case Blocked => {
               JOptionPane.showMessageDialog(frame, "Cannot Move There", "???", JOptionPane.WARNING_MESSAGE)
@@ -100,18 +106,11 @@ object Main {
     }
 
     def drawStatus(g:Graphics2D) {
-      val food = board.player.food
-      g.setColor(Color.white)
-      g.drawString("Food:"+food, 10, 25)
-      val foodAsPercentage = (0.00 + food) / (0.00 + playerStartFood)
-      val width = 100
-      val height = 15
-      g.setColor(Color.orange)
-      g.fillRect(65, 12, (width*foodAsPercentage).asInstanceOf[Int], height)
-      g.setColor(Color.darkGray)
-      g.drawRect(65, 12, width, height)
+      drawBarWidget(g, Color.white, Color.darkGray, Color.orange, "food", board.player.food, playerStartFood, 0)
+      drawBarWidget(g, Color.white, Color.darkGray, Color.red, "health", board.player.health, playerStartHealth, 30)
 
     }
+
 
     val contents = new JPanel(new BorderLayout())
     frame.getContentPane().add(contents)
@@ -122,7 +121,6 @@ object Main {
 
     frame.setVisible(true)
   }
-
 
   def getKeyCommand(c:Int):Option[Direction] = {
     c match {
@@ -143,6 +141,20 @@ object Main {
       case KeyEvent.VK_NUMPAD7 => Some(NW)
       case _ => None
     }
+  }
+
+  def drawBarWidget(g:Graphics2D, labelColor:Color, borderColor:Color, fillColor:Color, label:String, value:Int, maxValue:Int, yOffset:Int) {
+    g.translate(0, yOffset)
+    g.setColor(labelColor)
+    g.drawString(label+value, 10, 25)
+    val percentage = value.toDouble / maxValue.toDouble
+    val width = 100
+    val height = 15
+    g.setColor(fillColor)
+    g.fillRect(80, 12, (width*percentage).asInstanceOf[Int], height)
+    g.setColor(borderColor)
+    g.drawRect(80, 12, width, height)
+    g.translate(0, -yOffset)
   }
 }
 
