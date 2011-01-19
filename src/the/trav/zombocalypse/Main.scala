@@ -1,11 +1,11 @@
 package the.trav.zomboclypse
 
 import java.awt.event.{KeyEvent, KeyAdapter}
-import java.awt.{Color, Graphics2D, Graphics}
 import the.trav.zombocalypse.Constants._
 import the.trav.zombocalypse._
 import javax.swing.{JOptionPane, JPanel, JFrame}
 import java.util.Random
+import java.awt._
 
 object Main {
   val random = new Random(System.currentTimeMillis)
@@ -46,7 +46,6 @@ object Main {
     frame.setSize(frameSize.x, frameSize.y)
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
 
-
     var board = newBoard(numZombies)
 
     def handleCommand(direction:Option[Direction]) {
@@ -58,6 +57,11 @@ object Main {
             }
             case Eaten => {
               JOptionPane.showMessageDialog(frame, "You were eaten by a zombie", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
+              numZombies += difficultyDecrease
+              board = newBoard(numZombies)
+            }
+            case Starved => {
+              JOptionPane.showMessageDialog(frame, "Starved to death", "Oh Noes!", JOptionPane.WARNING_MESSAGE)
               numZombies += difficultyDecrease
               board = newBoard(numZombies)
             }
@@ -95,14 +99,26 @@ object Main {
       board.draw(g)
     }
 
-    frame.getContentPane().add(new JPanel(){
-      override def paint(g1 : Graphics) {
-        val g = g1.asInstanceOf[Graphics2D]
-        g.setColor(Color.white)
-        g.fillRect(0,0, canvasSize.x, canvasSize.y)
-        drawScene(g)
-      }
-    })
+    def drawStatus(g:Graphics2D) {
+      val food = board.player.food
+      g.setColor(Color.white)
+      g.drawString("Food:"+food, 10, 25)
+      val foodAsPercentage = (0.00 + food) / (0.00 + playerStartFood)
+      val width = 100
+      val height = 15
+      g.setColor(Color.orange)
+      g.fillRect(65, 12, (width*foodAsPercentage).asInstanceOf[Int], height)
+      g.setColor(Color.darkGray)
+      g.drawRect(65, 12, width, height)
+
+    }
+
+    val contents = new JPanel(new BorderLayout())
+    frame.getContentPane().add(contents)
+
+    contents.add(PaintPanel(drawScene, Color.white, canvasSize), BorderLayout.CENTER)
+    contents.add(PaintPanel(drawStatus, Color.black, statusSize), BorderLayout.EAST)
+
 
     frame.setVisible(true)
   }
@@ -111,12 +127,12 @@ object Main {
   def getKeyCommand(c:Int):Option[Direction] = {
     c match {
       //Laptop keyboard
-      case KeyEvent.VK_T => Some(NE)
-      case KeyEvent.VK_G => Some(E)
-      case KeyEvent.VK_B => Some(SE)
-      case KeyEvent.VK_C => Some(SW)
-      case KeyEvent.VK_D => Some(W)
-      case KeyEvent.VK_E => Some(NW)
+      case KeyEvent.VK_E => Some(NE)
+      case KeyEvent.VK_D => Some(E)
+      case KeyEvent.VK_C => Some(SE)
+      case KeyEvent.VK_Z => Some(SW)
+      case KeyEvent.VK_A => Some(W)
+      case KeyEvent.VK_Q => Some(NW)
 
       //Proper keyboard
       case KeyEvent.VK_NUMPAD9 => Some(NE)
@@ -130,8 +146,19 @@ object Main {
   }
 }
 
+case class PaintPanel(f:(Graphics2D)=>Unit, bg:Color, s:Coord) extends JPanel {
+  this.setPreferredSize(new Dimension(s.x, s.y))
+  override def paint(g1 : Graphics) {
+    val g = g1.asInstanceOf[Graphics2D]
+    g.setColor(bg)
+    g.fillRect(0,0, s.x, s.y)
+    f(g)
+  }
+}
+
 trait MoveResult
 case class Moved(b:Board) extends MoveResult
 case object Eaten extends MoveResult
 case object Escaped extends MoveResult
 case object Blocked extends MoveResult
+case object Starved extends MoveResult

@@ -11,9 +11,12 @@ object Constants {
   val initialZombies = 20
 
   val difficultyIncrease = 2
-  val difficultyDecrease = -5
+  val difficultyDecrease = -3
 
-  val playerStart = Coord(0, gridSize/2)
+  val foodUsedPerMove = 1
+
+  val playerStartPos = Coord(0, gridSize/2)
+  val playerStartFood = 50
 
   val playerViewDistance = 4
   val zombieViewDistance = 3
@@ -21,8 +24,10 @@ object Constants {
   val showCoords = false
 
   val twoTimesSinSixtyDeg = 2 * Math.sin(Math.toRadians(60))
-  val canvasSize = new Coord(800,600)
-  val frameSize = new Coord(canvasSize.x, canvasSize.y)
+  val frameSize = Coord(1000, 600)
+  val statusSize = Coord(200, frameSize.y)
+  val canvasSize = Coord(frameSize.x - statusSize.x, frameSize.y)
+
 
   val emptyHex = ImageIO.read(new File("tinyhex.png"))
   val title = "zombocalypse"
